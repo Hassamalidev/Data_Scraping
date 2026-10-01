@@ -1,0 +1,4 @@
+# Keep LF everywhere: these files are mounted into / copied to Linux containers.
+* text=auto eol=lf
+*.ico binary
+*.png binary

@@ -1,0 +1,33 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Generated data (see CLAUDE.md §5)
+/exports/*
+!/exports/.gitkeep
+/data/raw/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Node
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.pnpm-store/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

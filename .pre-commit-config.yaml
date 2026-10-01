@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^scraper/
+
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 26.5.1
+    hooks:
+      - id: black
+        files: ^scraper/
+
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint (web)
+        entry: pnpm --dir web exec eslint --fix
+        language: system
+        files: ^web/.*\.(ts|tsx|mjs)$
+        pass_filenames: false
+
+      - id: prettier
+        name: prettier (web)
+        entry: pnpm --dir web exec prettier --write --ignore-unknown
+        language: system
+        files: ^web/
+        exclude: ^web/(pnpm-lock\.yaml|AGENTS\.md)$
