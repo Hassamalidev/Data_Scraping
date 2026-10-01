@@ -142,12 +142,22 @@ class PoliteClient:
         source_id: str,
         params: Mapping[str, Any] | None = None,
         conditional: bool = True,
+        timeout: float | None = None,
     ) -> FetchResult:
         full_url = str(httpx.URL(url, params=params)) if params else url
-        return self._request("GET", full_url, source_id=source_id, conditional=conditional)
+        return self._request(
+            "GET", full_url, source_id=source_id, conditional=conditional, timeout=timeout
+        )
 
-    def post(self, url: str, *, source_id: str, data: Mapping[str, str]) -> FetchResult:
-        return self._request("POST", url, source_id=source_id, data=data)
+    def post(
+        self,
+        url: str,
+        *,
+        source_id: str,
+        data: Mapping[str, str],
+        timeout: float | None = None,
+    ) -> FetchResult:
+        return self._request("POST", url, source_id=source_id, data=data, timeout=timeout)
 
     def _fetch_robots(self, robots_url: str) -> httpx.Response:
         with self.limiter.slot(httpx.URL(robots_url).host):
@@ -161,6 +171,7 @@ class PoliteClient:
         source_id: str,
         data: Mapping[str, str] | None = None,
         conditional: bool = False,
+        timeout: float | None = None,
     ) -> FetchResult:
         host = httpx.URL(url).host
 
@@ -185,7 +196,9 @@ class PoliteClient:
         else:
             cached = None
 
-        response = self._send_with_retries(method, url, host, headers=headers, data=data)
+        response = self._send_with_retries(
+            method, url, host, headers=headers, data=data, timeout=timeout
+        )
         fetched_at = datetime.now(UTC)
 
         if response.status_code == 304 and cached is not None:
@@ -233,7 +246,10 @@ class PoliteClient:
         *,
         headers: Mapping[str, str],
         data: Mapping[str, str] | None,
+        timeout: float | None,
     ) -> httpx.Response:
+        # Slow endpoints (e.g. Overpass queries) may need more than the client default.
+        request_timeout = timeout if timeout is not None else httpx.USE_CLIENT_DEFAULT
         retrying = Retrying(
             stop=stop_after_attempt(MAX_ATTEMPTS),
             wait=_backoff,
@@ -246,7 +262,9 @@ class PoliteClient:
         try:
             for attempt in retrying:
                 with attempt, self.limiter.slot(host):
-                    response = self._client.request(method, url, headers=headers, data=data)
+                    response = self._client.request(
+                        method, url, headers=headers, data=data, timeout=request_timeout
+                    )
                     if response.status_code == 429 or response.status_code >= 500:
                         retry_after = parse_retry_after(response.headers.get("Retry-After"))
                         if retry_after is not None and retry_after > MAX_RETRY_AFTER_SECONDS:

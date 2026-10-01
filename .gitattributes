@@ -1,4 +1,6 @@
 # Keep LF everywhere: these files are mounted into / copied to Linux containers.
 * text=auto eol=lf
+# Captured pages must stay byte-for-byte as the server sent them.
+scraper/tests/fixtures/** -text
 *.ico binary
 *.png binary

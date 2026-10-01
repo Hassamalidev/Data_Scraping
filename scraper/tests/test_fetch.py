@@ -407,3 +407,15 @@ def test_post_sends_form_data_and_archives_per_request_body(respx_mock, client):
     assert endpoint.calls[0].request.content == b"data=query+one"
     assert first.raw_path != second.raw_path
     assert first.raw_path.suffix == ".json"
+
+
+def test_per_request_timeout_overrides_the_client_default(respx_mock, client):
+    robots(respx_mock)
+    endpoint = respx_mock.post(f"{SITE}/api/interpreter").respond(200, json={"elements": []})
+
+    client.post(f"{SITE}/api/interpreter", source_id="test", data={"data": "q"}, timeout=120)
+    client.post(f"{SITE}/api/interpreter", source_id="test", data={"data": "q"})
+
+    slow, default = (call.request.extensions["timeout"]["read"] for call in endpoint.calls)
+    assert slow == 120
+    assert default == 30.0

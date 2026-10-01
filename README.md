@@ -14,7 +14,7 @@ by phase (CLAUDE.md §9).
 | 0 | Scaffold: monorepo, Docker Compose, dbmate, tooling | Done |
 | 1 | Database schema, source registry, Drizzle types | Done |
 | 2 | Polite fetch core (robots.txt, rate limit, retries, conditional GET, raw archive) | Done |
-| 3 | Source inspection | Not started |
+| 3 | Source inspection ([docs/sources.md](docs/sources.md)) | Done, awaiting source decisions |
 | 4 | Source adapters | Not started |
 | 5 | Normalize / geocode / dedupe / merge pipeline | Not started |
 | 6 | CSV export, events, worker | Not started |
@@ -86,6 +86,20 @@ uv run black --check .
 
 `uv run mbd ...` works too. On Windows machines where an Application Control policy blocks
 the generated `mbd.exe` / `pytest.exe` launchers, use the `python -m` form shown above.
+
+### Inspecting a source
+
+Before any adapter is written, the source is inspected through the same polite client the
+scraper uses (robots.txt check, rate limit, identifying User-Agent):
+
+```sh
+uv run python -m mbd inspect https://hiccanada.ca/certified/ --source hicc_bc
+uv run python -m mbd inspect https://hiccanada.ca/certified/ --source hicc_bc --fixture certified.html
+```
+
+`--fixture` saves the page to `scraper/tests/fixtures/<source>/`. Findings go in
+[docs/sources.md](docs/sources.md). Do not commit fixtures that contain personal data or that
+come from a site whose terms forbid redistribution.
 
 ## Web
 
