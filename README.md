@@ -13,7 +13,7 @@ by phase (CLAUDE.md §9).
 |---|---|---|
 | 0 | Scaffold: monorepo, Docker Compose, dbmate, tooling | Done |
 | 1 | Database schema, source registry, Drizzle types | Done |
-| 2 | Polite fetch core | Not started |
+| 2 | Polite fetch core (robots.txt, rate limit, retries, conditional GET, raw archive) | Done |
 | 3 | Source inspection | Not started |
 | 4 | Source adapters | Not started |
 | 5 | Normalize / geocode / dedupe / merge pipeline | Not started |
